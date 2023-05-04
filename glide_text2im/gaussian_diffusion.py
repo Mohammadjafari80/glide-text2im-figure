@@ -444,7 +444,7 @@ class GaussianDiffusion:
                     normalized_image = (img + 1) * 0.5
 
                     img_folder = os.path.join(
-                        output_path, f"Batch-{img_idx}", f"init_image_{batch_idx}"
+                        output_path, f"Batch-{start_img_idx}", f"init_image_{batch_idx}"
                     )
                     os.makedirs(img_folder, exist_ok=True)
                     img_path = os.path.join(img_folder, f"timestep_{img_idx}.png")
