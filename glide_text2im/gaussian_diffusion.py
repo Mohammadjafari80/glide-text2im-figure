@@ -421,6 +421,21 @@ class GaussianDiffusion:
         img_idx = skip_timesteps
 
         final = None
+
+        if output_path:  # Save intermediate images if output_path is provided
+            for batch_idx, img in enumerate(init_image):  # Iterate over the batch
+                # Normalize the image to [0, 1]
+                normalized_image = (img + 1) * 0.5
+                img_folder = os.path.join(
+                    output_path,
+                    f"Batch-{start_img_idx:03d}",
+                    f"init_image_{batch_idx:03d}",
+                )
+                os.makedirs(img_folder, exist_ok=True)
+                img_path = os.path.join(img_folder, f"timestep_{0:03d}.png")
+                torchvision.utils.save_image(normalized_image, img_path)
+            img_idx += 1
+
         for sample in self.p_sample_loop_progressive(
             model,
             shape,
