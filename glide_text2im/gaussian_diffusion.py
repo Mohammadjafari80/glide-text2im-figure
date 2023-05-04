@@ -396,6 +396,7 @@ class GaussianDiffusion:
         skip_timesteps=0,
         init_image=None,
         output_path=None,
+        start_img_idx=0,  # Added start_img_idx parameter
     ):
         """
         Generate samples from the model.
@@ -417,7 +418,7 @@ class GaussianDiffusion:
         :return: a non-differentiable batch of samples.
         """
 
-        img_idx = 0  # ### MODIFIED: Initialize image index
+        img_idx = start_img_idx
 
         final = None
         for sample in self.p_sample_loop_progressive(
@@ -435,12 +436,19 @@ class GaussianDiffusion:
         ):
             final = sample
 
-            if output_path:
-                for batch_idx, img in enumerate(sample["sample"]):
-                    img_folder = os.path.join(output_path, f"init_image_{batch_idx}")
+            if output_path:  # Save intermediate images if output_path is provided
+                for batch_idx, img in enumerate(
+                    sample["sample"]
+                ):  # Iterate over the batch
+                    # Normalize the image to [0, 1]
+                    normalized_image = (img + 1) * 0.5
+
+                    img_folder = os.path.join(
+                        output_path, f"Batch-{img_idx}", f"init_image_{batch_idx}"
+                    )
                     os.makedirs(img_folder, exist_ok=True)
                     img_path = os.path.join(img_folder, f"timestep_{img_idx}.png")
-                    torchvision.utils.save_image(img, img_path)
+                    torchvision.utils.save_image(normalized_image, img_path)
                 img_idx += 1
 
         return final["sample"]
